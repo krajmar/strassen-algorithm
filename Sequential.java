@@ -46,11 +46,12 @@ public class Sequential {
             }
         }
     }
-    public Sequential(int [][] matrix1, int [][] matrix2) {
+    /*public Sequential(int [][] matrix1, int [][] matrix2) {
         this.matrix1 = matrix1;
         this.matrix2 = matrix2;
+    }*/
 
-    }
+
 
     public ArrayList<int[][]> splitMatrix(int[][] matrix){
         int[][] submat1=new int[matrix.length/2][matrix.length/2];
@@ -116,11 +117,13 @@ public class Sequential {
             }
         }
 
+        /*
         printMatrix(this.matrix1);
         System.out.println();
         printMatrix(this.matrix2);
         System.out.println();
         printMatrix(this.finalmatrix);
+         */
     }
 
     public int[][] sumMatrix(int [][] matrix1, int [][] matrix2){
