@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Random;
 
 public class Sequential {
     private int[][] matrix1;
@@ -10,24 +9,8 @@ public class Sequential {
         return matrix1;
     }
 
-    public void setMatrix1(int[][] matrix1) {
-        this.matrix1 = matrix1;
-    }
-
     public int[][] getMatrix2() {
         return matrix2;
-    }
-
-    public void setMatrix2(int[][] matrix2) {
-        this.matrix2 = matrix2;
-    }
-
-    public int[][] getFinalmatrix() {
-        return finalmatrix;
-    }
-
-    public void setFinalmatrix(int[][] finalmatrix) {
-        this.finalmatrix = finalmatrix;
     }
 
     public Sequential(){}
