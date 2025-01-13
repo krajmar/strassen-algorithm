@@ -43,27 +43,22 @@ public class Sequential {
         int [][] submat4=new int[matrix.length/2][matrix.length/2];
         //topleft
         for(int i=0;i<matrix.length/2;i++){
-            for(int j=0;j<matrix.length/2;j++){
-                submat1[i][j]=matrix[i][j];
-            }
+            System.arraycopy(matrix[i], 0, submat1[i], 0, matrix.length / 2);
         }
         //bottomleft
         for(int i=matrix.length/2;i<matrix.length;i++){
-            for(int j=0;j<matrix.length/2;j++){
-                submat2[i-matrix.length/2][j]=matrix[i][j];
-            }
+            System.arraycopy(matrix[i], 0, submat2[i - matrix.length / 2], 0, matrix.length / 2);
         }
         //topright
         for(int i=0;i<matrix.length/2;i++){
-            for(int j=matrix.length/2;j<matrix.length;j++){
-                submat3[i][j-matrix.length/2]=matrix[i][j];
-            }
+            if (matrix.length - matrix.length / 2 >= 0)
+                System.arraycopy(matrix[i], matrix.length / 2, submat3[i], 0, matrix.length - matrix.length / 2);
         }
         //bottomright
         for(int i=matrix.length/2;i<matrix.length;i++){
-            for(int j=matrix.length/2;j<matrix.length;j++){
-                submat4[i-matrix.length/2][j-matrix.length/2]=matrix[i][j];
-            }
+            if (matrix.length - matrix.length / 2 >= 0)
+                System.arraycopy(matrix[i], matrix.length / 2, submat4[i - matrix.length / 2], 0, matrix.length - matrix.length / 2);
+
         }
 
 
@@ -77,27 +72,19 @@ public class Sequential {
     public void mergeMatrix(ArrayList<int[][]>arrList){
         //topleft
         for(int i=0;i<arrList.get(0).length;i++){
-            for(int j=0;j<arrList.get(0).length;j++){
-                this.finalmatrix[i][j]=arrList.get(0)[i][j];
-            }
+            System.arraycopy(arrList.get(0)[i], 0, this.finalmatrix[i], 0, arrList.get(0).length);
         }
         //bottomleft
         for(int i=0;i<arrList.get(0).length;i++){
-            for(int j=0;j<arrList.get(0).length;j++){
-                this.finalmatrix[arrList.get(1).length+i][j]=arrList.get(1)[i][j];
-            }
+            System.arraycopy(arrList.get(1)[i], 0, this.finalmatrix[arrList.get(1).length + i], 0, arrList.get(0).length);
         }
         //topright
         for(int i=0;i<arrList.get(0).length;i++){
-            for(int j=0;j<arrList.get(0).length;j++){
-                this.finalmatrix[i][arrList.get(2).length+j]=arrList.get(2)[i][j];
-            }
+            System.arraycopy(arrList.get(2)[i], 0, this.finalmatrix[i], arrList.get(2).length, arrList.get(0).length);
         }
         //bottomright
         for(int i=0;i<arrList.get(0).length;i++){
-            for(int j=0;j<arrList.get(0).length;j++){
-                this.finalmatrix[arrList.get(3).length+i][arrList.get(3).length+j]=arrList.get(3)[i][j];
-            }
+            System.arraycopy(arrList.get(3)[i], 0, this.finalmatrix[arrList.get(3).length + i], arrList.get(3).length, arrList.get(0).length);
         }
 
         /*
@@ -142,7 +129,7 @@ public class Sequential {
         if (row2 != col1) {
             return null;
         }
-        int C[][] = new int[row1][col2];
+        int[][] C = new int[row1][col2];
 
         // Multiply the two matrices
         for (int i = 0; i < row1; i++) {
@@ -153,18 +140,6 @@ public class Sequential {
         }
         return C;
     }
-    public void printMatrix(int[][] mat){
-        for(int i=0;i<mat.length;i++) {
-            for (int j = 0; j < mat[0].length; j++) {
-                System.out.print(mat[i][j] + " ");
-            }
-            System.out.println();
-        }
-    }
-
-
-
-
 
 
 }
