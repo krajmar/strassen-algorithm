@@ -1,9 +1,7 @@
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         //spored zadacata, korisnikot ja zadava goleminata na matricite
@@ -56,8 +54,8 @@ public class Main {
                 String csvData = duration + " ms";
 
                 // Pishuva vo CSV fajlot
-                writer.append("Size: "+sizeMat+ " \n"); //kolku e size od matrica
-                writer.append("Sequential: " + csvData+"\n"); //pishuva za sequential
+                writer.append("Size: ").append(String.valueOf(sizeMat)).append(" \n"); //kolku e size od matrica
+                writer.append("Sequential: ").append(csvData).append("\n"); //pishuva za sequential
                 writer.append("Parallel: yet to be determined\n"); //pishuva za parallel
                 writer.append("Distributed: yet to be determined\n"); //pishuva za distributed
                 //ushte ne e izvedena implementacijata no treba vo eden run za site 3 da se pishuva
@@ -65,15 +63,13 @@ public class Main {
                 System.err.println("Error writing to CSV file: " + e.getMessage());
             }
         }
-        else {
-            System.out.println("More than 10mins, stop the testing.");
-        }
+        else System.out.println("More than 10mins, stop the testing.");
     }
-    public static void printMatrix(int[][] mat) {
+    /*public static void printMatrix(int[][] mat) {
         for (int i = 0; i < mat.length; i++) {
             for (int j = 0; j < mat[0].length; j++) {
                 System.out.print(mat[i][j] + " ");
             }
             System.out.println();
         }
-    }}
+    }*/ }
