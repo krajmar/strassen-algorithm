@@ -31,6 +31,41 @@ public class Sequential {
         }
     }
 
+
+    public void runSequential(){
+        ArrayList<int[][]> arrList1 = splitMatrix(getMatrix1());
+        //ja deli vtorata matrica na cetvrtini (4 pomali kvadratni matrici)
+        ArrayList<int[][]> arrList2 = splitMatrix(getMatrix2());
+
+        //ovde ke se zacuvaat finalnite cetvrtini (4 pomali kvadratni matrici)
+        //potoa samo se spojuvaat vo krajnata matrica
+        ArrayList<int[][]> finalArrayList = new ArrayList<>();
+
+        //strassen algorithm matrici spored wikipedia
+        int[][] M1 = multiplyMatrix(sumMatrix(arrList1.get(0), arrList1.get(3)),
+                sumMatrix(arrList2.get(0), arrList2.get(3)));
+        int[][] M2 = multiplyMatrix(sumMatrix(arrList1.get(1), arrList1.get(3)),
+                arrList2.get(0));
+        int[][] M3 = multiplyMatrix(arrList1.get(0), subtractMatrix(arrList2.get(2), arrList2.get(3)));
+        int[][] M4 = multiplyMatrix(arrList1.get(3), subtractMatrix(arrList2.get(1), arrList2.get(0)));
+        int[][] M5 = multiplyMatrix(sumMatrix(arrList1.get(0), arrList1.get(2)), arrList2.get(3));
+        int[][] M6 = multiplyMatrix(subtractMatrix(arrList1.get(1), arrList1.get(0)), sumMatrix(arrList2.get(0), arrList2.get(2)));
+        int[][] M7 = multiplyMatrix(subtractMatrix(arrList1.get(2), arrList1.get(3)), sumMatrix(arrList2.get(1), arrList2.get(3)));
+
+
+        int[][] matI = sumMatrix(subtractMatrix(sumMatrix(M1, M4), M5), M7); //topleft za final matrix
+        int[][] matJ = sumMatrix(M2, M4); //bottomleft za final matrix
+        int[][] matK = sumMatrix(M3, M5); //topright za final matrix
+        int[][] matL = sumMatrix(sumMatrix(subtractMatrix(M1, M2), M3), M6); //bottomright za final matrix
+
+        finalArrayList.add(matI);
+        finalArrayList.add(matJ);
+        finalArrayList.add(matK);
+        finalArrayList.add(matL);
+
+        mergeMatrix(finalArrayList);
+    }
+
     //funkcija za zgolemuvanje na dimenzijata na matricata za 1
     public int[][] padMatrix(int[][] matrix) {
         int originalSize = matrix.length;
