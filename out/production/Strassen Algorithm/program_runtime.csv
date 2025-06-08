@@ -1,6 +1,7 @@
-Size: 10 
-Sequential: 24.0 ms
-Size: 400 
-Sequential: 1725.0 ms
-Size: 1000 
-Sequential: 9100.0 ms
+Size: 2500 
+Sequential: 40909.0 ms
+Size: 2500 
+Parallel: 
+5482.0 ms
+Size: 65 
+Sequential: 41.0 ms

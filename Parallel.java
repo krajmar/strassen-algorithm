@@ -3,11 +3,18 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.RecursiveTask;
+import java.util.concurrent.ForkJoinPool;
 
-public class Parallel extends Thread{
+public class Parallel{
+
+    public static final int threshold = 64;
     private int[][] matrix1;
     private int[][] matrix2;
     private int[][] finalmatrix;
+
+    private static final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
 
     public int[][] getMatrix1() {
         return matrix1;
@@ -70,6 +77,43 @@ public class Parallel extends Thread{
     }
 
     public int[][] sumMatrix(int[][] matrix1, int[][] matrix2) {
+        int size = matrix1.length;
+        int[][] result = new int[size][size];
+        int numThreads = Runtime.getRuntime().availableProcessors();
+        List<Future<?>> futures = new ArrayList<>();
+
+        int chunkSize = size / numThreads;
+
+        for (int t = 0; t < numThreads; t++) {
+            int startRow = t * chunkSize;
+            int endRow = (t == numThreads - 1) ? size : startRow + chunkSize;
+
+            futures.add(executor.submit(() -> {
+                for (int i = startRow; i < endRow; i++) {
+                    for (int j = 0; j < size; j++) {
+                        result[i][j] = matrix1[i][j] + matrix2[i][j];
+                    }
+                }
+            }));
+        }
+
+        waitFutures(futures);
+        return result;
+    }
+
+    private void waitFutures(List<Future<?>> futures) {
+        for (Future<?> f : futures) {
+            try {
+                f.get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+
+    /*public int[][] sumMatrix(int[][] matrix1, int[][] matrix2) {
         int[][] newMat = new int[matrix1.length][matrix1.length];
 
         int numThreads = Runtime.getRuntime().availableProcessors();
@@ -102,8 +146,8 @@ public class Parallel extends Thread{
             }
         }
         return newMat;
-    }
-    public int[][] subtractMatrix(int[][] matrix1, int[][] matrix2) {
+    }*/
+    /*public int[][] subtractMatrix(int[][] matrix1, int[][] matrix2) {
         int[][] newMat = new int[matrix1.length][matrix1.length];
         int size = matrix1.length;
 
@@ -137,9 +181,36 @@ public class Parallel extends Thread{
             }
         }
         return newMat;
+    }*/
+
+    public int[][] subtractMatrix(int[][] matrix1, int[][] matrix2) {
+        int size = matrix1.length;
+        int[][] result = new int[size][size];
+        int numThreads = Runtime.getRuntime().availableProcessors();
+
+        List<Future<?>> futures = new ArrayList<>();
+
+        int chunkSize = size / numThreads;
+
+        for (int t = 0; t < numThreads; t++) {
+            int startRow = t * chunkSize;
+            int endRow = (t == numThreads - 1) ? size : startRow + chunkSize;
+
+            futures.add(executor.submit(() -> {
+                for (int i = startRow; i < endRow; i++) {
+                    for (int j = 0; j < size; j++) {
+                        result[i][j] = matrix1[i][j] - matrix2[i][j];
+                    }
+                }
+            }));
+        }
+
+        waitFutures(futures);
+        return result;
     }
 
-    public int[][] multiplyMatrix(int[][] A, int[][] B) {
+
+    /*public int[][] multiplyMatrix(int[][] A, int[][] B) {
         int row1 = A.length;
         int col1 = A[0].length;
         int row2 = B.length;
@@ -177,7 +248,38 @@ public class Parallel extends Thread{
             }
         }
         return C;
+    }*/
+
+    public int[][] multiplyMatrix(int[][] A, int[][] B) {
+        int row1 = A.length, col1 = A[0].length, row2 = B.length, col2 = B[0].length;
+        if (col1 != row2) return null;
+
+        int[][] result = new int[row1][col2];
+        int numThreads = Runtime.getRuntime().availableProcessors();
+
+        List<Future<?>> futures = new ArrayList<>();
+
+        int chunkSize = row1 / numThreads;
+
+        for (int t = 0; t < numThreads; t++) {
+            int startRow = t * chunkSize;
+            int endRow = (t == numThreads - 1) ? row1 : startRow + chunkSize;
+
+            futures.add(executor.submit(() -> {
+                for (int i = startRow; i < endRow; i++) {
+                    for (int j = 0; j < col2; j++) {
+                        for (int k = 0; k < col1; k++) {
+                            result[i][j] += A[i][k] * B[k][j];
+                        }
+                    }
+                }
+            }));
+        }
+
+        waitFutures(futures);
+        return result;
     }
+
 
     public void mergeMatrix(ArrayList<int[][]> arrList) {
         int size = arrList.get(0).length; //site se od ista golemina
@@ -192,84 +294,89 @@ public class Parallel extends Thread{
         Thread [] threads = new Thread[numThreads];
         int chunkSize = size / numThreads;
 
+        List<Future<?>> futures = new ArrayList<>();
+
         for(int t=0; t<numThreads; t++) {
             int startRow = t * chunkSize;
             int endRow = (t == numThreads - 1) ? size : startRow + chunkSize;
-                threads[t] = new Thread(()-> {
+                futures.add(executor.submit(()-> {
                 for (int i = startRow; i < endRow; i++) {
                     System.arraycopy(arrList.get(0)[i], 0, this.finalmatrix[i], 0, size);
                 }
-            });
-                threads[t].start();
+            }));
+                //threads[t].start();
         }
 
-        for (int i = 0; i < numThreads; i++) {
+        /*for (int i = 0; i < numThreads; i++) {
             try {
                 threads[i].join(); // Wait for each thread to finish
             } catch (InterruptedException e) {
                 System.err.println("Error joining threads at mergeMatrix top left: " + e.getMessage());
             }
-        }
+        }*/
 
         //bottom-left
         for(int t=0; t<numThreads; t++) {
             int startRow = t * chunkSize;
             int endRow = (t == numThreads - 1) ? size : startRow + chunkSize;
-            threads[t] = new Thread(()-> {
+            futures.add(executor.submit(()-> {
                 for (int i = startRow; i < endRow; i++) {
             System.arraycopy(arrList.get(1)[i], 0, this.finalmatrix[size + i], 0, size);
                 }
-            });
-            threads[t].start();
+            }));
+            //threads[t].start();
         }
 
-        for (int i = 0; i < numThreads; i++) {
+        /*for (int i = 0; i < numThreads; i++) {
             try {
                 threads[i].join(); // Wait for each thread to finish
             } catch (InterruptedException e) {
                 System.err.println("Error joining threads at mergeMatrix bottom left: " + e.getMessage());
             }
-        }
+        }*/
 
         //top-right
         for(int t=0; t<numThreads; t++) {
             int startRow = t * chunkSize;
             int endRow = (t == numThreads - 1) ? size : startRow + chunkSize;
-            threads[t] = new Thread(()-> {
+            futures.add(executor.submit(()-> {
                 for (int i = startRow; i < endRow; i++) {
                 System.arraycopy(arrList.get(2)[i], 0, this.finalmatrix[i], size, size);
                 }
-            });
-                threads[t].start();
-                }
+            }));
+               // threads[t].start();
 
-                for (int i = 0; i < numThreads; i++) {
+
+                /*for (int i = 0; i < numThreads; i++) {
                 try {
                 threads[i].join(); // Wait for each thread to finish
                 } catch (InterruptedException e) {
                 System.err.println("Error joining threads at mergeMatrix top right: " + e.getMessage());
-                }
+                }*/
         }
 
         //bottom-right
         for(int t=0; t<numThreads; t++) {
             int startRow = t * chunkSize;
             int endRow = (t == numThreads - 1) ? size : startRow + chunkSize;
-            threads[t] = new Thread(()-> {
+            futures.add(executor.submit(()-> {
                 for (int i = startRow; i < endRow; i++) {
                     System.arraycopy(arrList.get(3)[i], 0, this.finalmatrix[size + i], 0, size);
                 }
-            });
-            threads[t].start();
+            }));
+            //threads[t].start();
         }
 
-        for (int i = 0; i < numThreads; i++) {
+        /*for (int i = 0; i < numThreads; i++) {
             try {
                 threads[i].join(); // Wait for each thread to finish
             } catch (InterruptedException e) {
                 System.err.println("Error joining threads at mergeMatrix bottom right: " + e.getMessage());
             }
-        }
+        }*/
+
+        waitFutures(futures);
+
 
         //ako sme dodale edna kolona i red na pocetnata, sega gi odzemame od finalnata
         if (this.matrix1.length % 2 != 0) {
@@ -331,7 +438,6 @@ public class Parallel extends Thread{
         }
 
         int halfSize = size / 2;
-        ExecutorService executor = Executors.newFixedThreadPool(4);
         List<Future<int[][]>> futures = new ArrayList<>();
 
         // Define quadrant extraction tasks
@@ -375,8 +481,6 @@ public class Parallel extends Thread{
             }
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
-        } finally {
-            executor.shutdown();
         }
 
         return arrList;

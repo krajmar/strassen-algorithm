@@ -43,7 +43,7 @@ public class Main {
                 if(chosenImp==1)
                     writer.append("Sequential: ").append(csvData).append("\n"); //pishuva za sequential
                 else if(chosenImp==2)
-                    writer.append("Parallel: yet to be determined\n"); //pishuva za parallel
+                    writer.append("Parallel: \n").append(csvData).append("\n"); //pishuva za parallel
                 else {
                     writer.append("Distributed: yet to be determined\n"); //pishuva za distributed
                 }
@@ -60,7 +60,8 @@ public class Main {
     }
 
     public static void parallelRealisation(int sizeMat){
-
+        Parallelz par = new Parallelz(sizeMat);
+        par.parallelStrassen();
     }
 
     public static void distributedRealisation(int sizeMat){
