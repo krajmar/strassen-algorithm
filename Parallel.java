@@ -384,11 +384,11 @@ public class Parallel{
         }
 
 
-        printMatrix(this.matrix1);
-        System.out.println();
-        printMatrix(this.matrix2);
-        System.out.println();
-        printMatrix(this.finalmatrix);
+        //printMatrix(this.matrix1);
+        //System.out.println();
+        //printMatrix(this.matrix2);
+        //System.out.println();
+        //printMatrix(this.finalmatrix);
     }
 
     public void printMatrix(int[][] mat) {

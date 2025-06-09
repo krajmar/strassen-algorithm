@@ -19,9 +19,11 @@ public class Parallelz {
         }
     }
     public int[][] parallelStrassen() {
-        int size = nextPowerOfTwo(Math.max(A.length, Math.max(B.length, B[0].length))); //najdi sleden power of 2 za da raboti rekurzijata so matricite
-        int[][] A_padded = padMatrix(A);
-        int[][] B_padded = padMatrix(B);
+        int insize = A.length;
+        int size = nextPowerOfTwo(A.length); //najdi sleden power of 2 za da raboti rekurzijata so matricite
+        int[][] A_padded = padMatrixToSize(A,size);
+        int[][] B_padded = padMatrixToSize(B,size);
+
 
         ForkJoinPool pool = new ForkJoinPool(); //threads koi imaat zavrseno so rabota ja kradat rabotata od drugite threads koi se zafateni
 
@@ -75,14 +77,11 @@ public class Parallelz {
 
     public static ArrayList<int[][]> splitMatrix(int[][] matrix) {
         ArrayList<int[][]> arrList = new ArrayList<>();
-        int size = matrix.length;
-        int[][] pmatrix = matrix; // Default so orginalnata matrica
+        // Default so orginalnata matrica
 
         // ako e neparna, zgolemi ja dolzinata i sirinata za 1 kolona i red
-        if (size % 2 == 1) {
-            pmatrix = padMatrix(matrix);
-            size += 1; // se zgolemuva goleminata
-        }
+        int size = matrix.length;
+
 
         // gi kreirame submatricite
         int[][] submat1 = new int[size / 2][size / 2];
@@ -92,38 +91,45 @@ public class Parallelz {
 
         //top-left
         for (int i = 0; i < size / 2; i++) {
-            //System.arraycopy(pmatrix[i], 0, submat1[i], 0, size / 2);
-            for (int j = 0; j < size / 2; j++)
-                submat1[i][j]=pmatrix[i][j];
+            System.arraycopy(matrix[i], 0, submat1[i], 0, size / 2);
+            /*for (int j = 0; j < size / 2; j++)
+                submat1[i][j]=pmatrix[i][j];*/
         }
 
         //bottom-left
         for (int i = size / 2; i < size; i++) {
-            //System.arraycopy(pmatrix[i], 0, submat2[i - size / 2], 0, size / 2);
-            for (int j = 0; j < size / 2; j++)
-                submat2[i-size/2][j]=pmatrix[i][j];
+            System.arraycopy(matrix[i], 0, submat2[i - size / 2], 0, size / 2);
+            /*for (int j = 0; j < size / 2; j++)
+                submat2[i-size/2][j]=pmatrix[i][j];*/
         }
 
         //top-right
         for (int i = 0; i < size / 2; i++) {
-            //System.arraycopy(pmatrix[i], size / 2, submat3[i], 0, size / 2);
-            for (int j = size / 2; j < size; j++)
-                submat3[i][j-size/2]=pmatrix[i][j];
+            System.arraycopy(matrix[i], size / 2, submat3[i], 0, size / 2);
+            /*for (int j = size / 2; j < size; j++)
+                submat3[i][j-size/2]=pmatrix[i][j];*/
         }
 
         //bottom-right
         for (int i = size / 2; i < size; i++) {
-           // System.arraycopy(pmatrix[i], size / 2, submat4[i - size / 2], 0, size / 2);
-            for (int j = size / 2; j < size; j++)
-                submat4[i-size/2][j-size/2]=pmatrix[i][j];
+           System.arraycopy(matrix[i], size / 2, submat4[i - size / 2], 0, size / 2);
+            /*for (int j = size / 2; j < size; j++)
+                submat4[i-size/2][j-size/2]=pmatrix[i][j];*/
         }
 
         arrList.add(submat1);
-        arrList.add(submat2);
         arrList.add(submat3);
+        arrList.add(submat2);
         arrList.add(submat4);
 
         return arrList;
+    }
+    public static int[][] padMatrixToSize(int[][] matrix, int newSize) {
+        int[][] paddedMatrix = new int[newSize][newSize];
+        for (int i = 0; i < matrix.length; i++) {
+            System.arraycopy(matrix[i], 0, paddedMatrix[i], 0, matrix[i].length);
+        }
+        return paddedMatrix;
     }
 
 
@@ -132,43 +138,46 @@ public class Parallelz {
         int finalSize = size * 2; // spojuvame 4 submatrici taka da dolzinata na edna *2 = dolzina na celata
         int [][] finalMatrix = new int[finalSize][finalSize];
 
+
         //top-left
-        for (int i = 0; i < size; i++) {
-            //System.arraycopy(C11, 0, finalMatrix[i], 0, size);
-            for (int j = 0; j < size; j++)
-                finalMatrix[i][j] = C11[i][j];
-        }
+        //for (int i = 0; i < size; i++) {
+            //System.arraycopy(C11[i], 0, finalMatrix[i], 0, size);
+            /*for (int j = 0; j < size; j++)
+                finalMatrix[i][j] = C11[i][j];*/
+        //}
 
         //bottom-left
-        for (int i = 0; i < size; i++) {
-            //System.arraycopy(C12, 0, finalMatrix[size + i], 0, size);
-            for (int j = 0; j < size; j++)
-                finalMatrix[i+size][j] = C21[i][j];
-        }
+        //for (int i = 0; i < size; i++) {
+          //  System.arraycopy(C21[i], 0, finalMatrix[size + i], 0, size);
+            /*for (int j = 0; j < size; j++)
+                finalMatrix[i][j+size] = C21[i][j];*/
+        //}
 
         //top-right
-        for (int i = 0; i < size; i++) {
-            //System.arraycopy(C21, 0, finalMatrix[i], size, size);
-            for (int j = 0; j < size; j++)
-                finalMatrix[i][j+size] = C12[i][j];
-        }
+        //for (int i = 0; i < size; i++) {
+          //  System.arraycopy(C12[i], 0, finalMatrix[i], size, size);
+            /*for (int j = 0; j < size; j++)
+                finalMatrix[i+size][j] = C12[i][j];*/
+        //}
 
         //bottom-right
+        //for (int i = 0; i < size; i++) {
+          //  System.arraycopy(C22[i], 0, finalMatrix[size + i], size, size);
+            /*for (int j = 0; j < size; j++)
+                finalMatrix[i+size][j+size] = C22[i][j];*/
+        //}
+
         for (int i = 0; i < size; i++) {
-            //System.arraycopy(C22, 0, finalMatrix[size + i], size, size);
-            for (int j = 0; j < size; j++)
-                finalMatrix[i+size][j+size] = C22[i][j];
+            // Top-left
+            System.arraycopy(C11[i], 0, finalMatrix[i], 0, size);
+            // Top-right
+            System.arraycopy(C12[i], 0, finalMatrix[i], size, size);
+            // Bottom-left
+            System.arraycopy(C21[i], 0, finalMatrix[size + i], 0, size);
+            // Bottom-right
+            System.arraycopy(C22[i], 0, finalMatrix[size + i], size, size);
         }
 
-        //ako sme dodale edna kolona i red na pocetnata, sega gi odzemame od finalnata
-            finalMatrix = unpadMatrix(finalMatrix, A.length);
-
-        /*printMatrix(A);
-        System.out.println();
-        printMatrix(B);
-        System.out.println();*/
-        //printMatrix(finalMatrix);
-        //System.out.println();
         return finalMatrix;
     }
 
@@ -194,7 +203,7 @@ public class Parallelz {
         }
         return newMat;
     }
-    /*public static int[][] padMatrix(int[][] matrix) {
+    public static int[][] padMatrix(int[][] matrix) {
         int originalSize = matrix.length;
         int newSize;
         if ((originalSize & (originalSize-1))==0)
@@ -202,29 +211,6 @@ public class Parallelz {
         else
             newSize=nextPowerOfTwo(originalSize);
 
-
-        if (newSize == originalSize) {
-            return matrix; // No padding needed
-        }
-
-        int[][] paddedMatrix = new int[newSize][newSize];
-        for (int i = 0; i < originalSize; i++) {
-            System.arraycopy(matrix[i], 0, paddedMatrix[i], 0, originalSize);
-        }
-
-        return paddedMatrix;
-    }*/
-    //funkcija za namaluvanje na dimenzijata na finalnata matrica za 1
-    public static int[][] unpadMatrix(int[][] matrix, int originalSize) {
-        int[][] unpaddedMatrix = new int[originalSize][originalSize];
-        for (int i = 0; i < originalSize; i++) {
-            System.arraycopy(matrix[i], 0, unpaddedMatrix[i], 0, originalSize);
-        }
-        return unpaddedMatrix;
-    }
-    public static int[][] padMatrix(int[][] matrix) {
-        int originalSize = matrix.length;
-        int newSize = (originalSize % 2 == 0) ? originalSize : originalSize + 1;
 
         if (newSize == originalSize) {
             return matrix; // No padding needed
@@ -245,7 +231,30 @@ public class Parallelz {
         }
         return unpaddedMatrix;
     }*/
-    public static int nextPowerOfTwo(int n) {
+    /*public static int[][] padMatrix(int[][] matrix) {
+        int originalSize = matrix.length;
+        int newSize = (originalSize % 2 == 0) ? originalSize : originalSize + 1;
+
+        if (newSize == originalSize) {
+            return matrix; // No padding needed
+        }
+
+        int[][] paddedMatrix = new int[newSize][newSize];
+        for (int i = 0; i < originalSize; i++) {
+            System.arraycopy(matrix[i], 0, paddedMatrix[i], 0, originalSize);
+        }
+
+        return paddedMatrix;
+    }*/
+    //funkcija za namaluvanje na dimenzijata na finalnata matrica za 1
+    public static int[][] unpadMatrix(int[][] matrix, int originalSize) {
+        int[][] unpaddedMatrix = new int[originalSize][originalSize];
+        for (int i = 0; i < originalSize; i++) {
+            System.arraycopy(matrix[i], 0, unpaddedMatrix[i], 0, originalSize);
+        }
+        return unpaddedMatrix;
+    }
+    /*public static int nextPowerOfTwo(int n) {
         if (n <= 0) return 1;
         n--;  // decrement n to handle the case when n is already a power of two
         n |= n >> 1;
@@ -254,6 +263,11 @@ public class Parallelz {
         n |= n >> 8;
         n |= n >> 16;
         return n + 1;
+    }*/
+    public static int nextPowerOfTwo(int n) {
+        int power = 1;
+        while (power < n) power *= 2;
+        return power;
     }
     public static int[][] multiplyMatrix(int[][] A, int[][] B) {
         int row1 = A.length;

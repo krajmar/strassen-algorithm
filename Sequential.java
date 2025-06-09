@@ -170,10 +170,10 @@ public class Sequential {
             this.finalmatrix = unpadMatrix(this.finalmatrix, this.matrix1.length);
         }
 
-        /*printMatrix(this.matrix1);
-        System.out.println();
-        printMatrix(this.matrix2);
-        System.out.println();*/
+        //printMatrix(this.matrix1);
+        //System.out.println();
+        //printMatrix(this.matrix2);
+        //System.out.println();
         //printMatrix(this.finalmatrix);
     }
 
