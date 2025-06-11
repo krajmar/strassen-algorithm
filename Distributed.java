@@ -1,4 +1,4 @@
-import mpi.*;
+import mpi.MPI;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -6,8 +6,8 @@ import java.util.Scanner;
 
 public class Distributed {
 
-    private int [][] A,B;
-    public static final int threshold = 64; //koga matricite se dovolno mali pa ne ni treba vekje paralelna implementacija
+    private final int [][] A,B;
+    //public static final int threshold = 64; //koga matricite se dovolno mali pa ne ni treba vekje paralelna implementacija
     public Distributed(int size) {
         this.A = new int[size][size];
         this.B = new int[size][size];
@@ -21,9 +21,7 @@ public class Distributed {
             }
         }
     }
-    public void runDistributed(int sizeMat){
-        int rank = MPI.COMM_WORLD.Rank();
-        int size = MPI.COMM_WORLD.Size();
+    public void runDistributed(int sizeMat, int rank, int size){
 
         final int ROOT = 0;
 
@@ -33,6 +31,7 @@ public class Distributed {
             //int[][] B = Sequential.generateMatrix(sizeMat);
 
             int [][] A = this.A;
+            int [][] B = this.B;
             // Divide A and B into submatrices needed for M1–M7
             int newSize = sizeMat / 2;
             int[][] A11 = new int[newSize][newSize];
@@ -69,7 +68,7 @@ public class Distributed {
                     {subtractMatrix(A12, A22), sumMatrix(B21, B22)}  // M7
             };
 
-            for (int i = 1; i <= 7; i++) {
+            for (int i = 1; i <=7; i++) {//promena da ne e <=7 zoshto mozhe da imame povekje od 7 procesi (workers)
                 MPI.COMM_WORLD.Send(sendPairs[i - 1], 0, 1, MPI.OBJECT, i, 0);
             }
 
@@ -108,7 +107,7 @@ public class Distributed {
 
             System.out.println("Distributed multiplication done.");
 
-        } else if (rank >= 1 && rank <= 7) {
+        } else if (rank >= 1 && rank <=7) {//istata promena na rank da e size a ne 7
             Object[] recvBuf = new Object[1];
             MPI.COMM_WORLD.Recv(recvBuf, 0, 1, MPI.OBJECT, ROOT, 0);
             Object[] pair = (Object[]) recvBuf[0];
@@ -176,31 +175,50 @@ public class Distributed {
         }
 
     }
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         MPI.Init(args);
+        int rank = MPI.COMM_WORLD.Rank();
+        int size = MPI.COMM_WORLD.Size(); //total number na procesite
+        int[] sizeMatArray = new int[1]; //buffer za da ja ima goleminata na matricata.
+        // za MPI. Bcast mora da bide niza
+
+        if (rank == 0) { //samo root procesot prima input bidejki e main proces
+            //drugite se workers
+            System.out.println("Specify sizes of matrices: ");
+            Scanner sc = new Scanner(System.in);
+            sizeMatArray[0] = sc.nextInt();
+            sc.close();
+        }
+        //Broadcast na golemina na matrica od rank 0 do site drugi procesi
+        //site procesi ucestvuvaat vo broadcastot
+        MPI.COMM_WORLD.Bcast(sizeMatArray, 0, 1, MPI.INT, 0);
+
+        int sizeMat = sizeMatArray[0];
+
         double startTime = System.currentTimeMillis();
-        System.out.println("Specify sizes of matrices: ");
-        Scanner sc = new Scanner(System.in);
-        int sizeMat = sc.nextInt();
         Distributed dis = new Distributed(sizeMat);
-        dis.runDistributed(sizeMat);
+        dis.runDistributed(sizeMat, rank, size);
         double endTime = System.currentTimeMillis();
         double duration = endTime - startTime; //presmetaj kolku vreme se executnuva algoritmot
-        if (duration <= 600000) { //ako e povekje od 10min ne pishuvaj
-            String fileName = "program_runtime.csv";
-            try (FileWriter writer = new FileWriter(fileName, true)) {
-                String csvData = duration + " ms";
+        if (rank == 0) {
+            //samo main procesot mozhe da pisuva vo CSV fajlot a ne site
+            //za da nema concurrent access
+            if (duration <= 600000) { //ako e povekje od 10min ne pishuvaj
+                String fileName = "program_runtime.csv";
+                try (FileWriter writer = new FileWriter(fileName, true)) {
+                    String csvData = duration + " ms";
 
-                // Pishuva vo CSV fajlot
-                writer.append("Size: ").append(String.valueOf(sizeMat)).append(" \n"); //kolku e size od matrica
+                    // Pishuva vo CSV fajlot
+                    writer.append("Size: ").append(String.valueOf(sizeMat)).append(" \n"); //kolku e size od matrica
 
-                    writer.append("Distributed:\n").append(csvData).append("\n");; //pishuva za distributed
-                //ushte ne e izvedena implementacijata no treba vo eden run za site 3 da se pishuva
-            } catch (IOException e) {
-                System.err.println("Error writing to CSV file: " + e.getMessage());
-            }
-        } else System.out.println("More than 10mins, stop the testing.");
+                    writer.append("Distributed:\n").append(csvData).append("\n"); //pishuva za distributed
+                    //ushte ne e izvedena implementacijata no treba vo eden run za site 3 da se pishuva
+                } catch (IOException e) {
+                    System.err.println("Error writing to CSV file: " + e.getMessage());
+                }
+            } else System.out.println("More than 10mins, stop the testing.");
 
-        MPI.Finalize();
+            MPI.Finalize();
+        }
     }
 }

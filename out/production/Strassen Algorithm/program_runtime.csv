@@ -5,3 +5,6 @@ Parallel:
 119.0 ms
 Size: 2000 
 Sequential: 11754.0 ms
+Size: 2000 
+Parallel: 
+2739.0 ms
