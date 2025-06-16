@@ -68,8 +68,26 @@ public class Sequential {
 
     //funkcija za zgolemuvanje na dimenzijata na matricata za 1
     public int[][] padMatrix(int[][] matrix) {
-        int originalSize = matrix.length;
+        /*int originalSize = matrix.length;
         int newSize = (originalSize % 2 == 0) ? originalSize : originalSize + 1;
+
+        if (newSize == originalSize) {
+            return matrix; // No padding needed
+        }
+
+        int[][] paddedMatrix = new int[newSize][newSize];
+        for (int i = 0; i < originalSize; i++) {
+            System.arraycopy(matrix[i], 0, paddedMatrix[i], 0, originalSize);
+        }
+
+        return paddedMatrix;*/
+        int originalSize = matrix.length;
+        int newSize;
+        if ((originalSize & (originalSize-1))==0)
+            newSize = originalSize;
+        else
+            newSize=nextPowerOfTwo(originalSize);
+
 
         if (newSize == originalSize) {
             return matrix; // No padding needed
@@ -90,17 +108,21 @@ public class Sequential {
         }
         return unpaddedMatrix;
     }
+    public static int nextPowerOfTwo(int n) {
+        int power = 1;
+        while (power < n) power *= 2;
+        return power;
+    }
 
     public ArrayList<int[][]> splitMatrix(int[][] matrix) {
         ArrayList<int[][]> arrList = new ArrayList<>();
-        int size = matrix.length;
-        int[][] pmatrix = matrix; // Default so orginalnata matrica
-
+        int[][] pmatrix = padMatrix(matrix); // Default so orginalnata matrica
+        int size = pmatrix.length;
         // ako e neparna, zgolemi ja dolzinata i sirinata za 1 kolona i red
-        if (size % 2 == 1) {
-            pmatrix = padMatrix(matrix);
-            size += 1; // se zgolemuva goleminata
-        }
+        //if (size % 2 == 1) {
+
+          //  size += 1; // se zgolemuva goleminata
+        //}
 
         // gi kreirame submatricite
         int[][] submat1 = new int[size / 2][size / 2];
@@ -166,9 +188,9 @@ public class Sequential {
         }
 
         //ako sme dodale edna kolona i red na pocetnata, sega gi odzemame od finalnata
-        if (this.matrix1.length % 2 != 0) {
+        //if (this.matrix1.length % 2 != 0) {
             this.finalmatrix = unpadMatrix(this.finalmatrix, this.matrix1.length);
-        }
+        //}
 
         //printMatrix(this.matrix1);
         //System.out.println();

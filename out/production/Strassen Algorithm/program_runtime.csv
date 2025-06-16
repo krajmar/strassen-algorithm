@@ -1,11 +1,90 @@
+Size: 500 
+Sequential: 170.0 ms
+Size: 500 
+Parallel: 
+130.0 ms
+Size: 1800 
+Distributed:
+14290.0 ms
+Size: 500 
+Distributed:
+603.0 ms
+Size: 500 
+Distributed:
+569.0 ms
 Size: 1000 
-Sequential: 1699.0 ms
+Sequential: 1314.0 ms
 Size: 1000 
 Parallel: 
-580.0 ms
-Size: 8 
-Distributed:
-49.0 ms
+472.0 ms
 Size: 1000 
 Distributed:
-3556.0 ms
+2808.0 ms
+Size: 5 
+Sequential: 0.0 ms
+Size: 5 
+Sequential: 10.0 ms
+Size: 500 
+Sequential: 198.0 ms
+Size: 500 
+Parallel: 
+116.0 ms
+Size: 500 
+Distributed:
+548.0 ms
+Size: 1000 
+Sequential: 1431.0 ms
+Size: 1000 
+Parallel: 
+452.0 ms
+Size: 1000 
+Distributed:
+3024.0 ms
+Size: 1500 
+Sequential: 14735.0 ms
+Size: 1500 
+Parallel: 
+3058.0 ms
+Size: 1500 
+Distributed:
+9133.0 ms
+Size: 2000 
+Sequential: 12502.0 ms
+Size: 2000 
+Parallel: 
+3254.0 ms
+Size: 2000 
+Distributed:
+22142.0 ms
+Size: 2500 
+Sequential: 295423.0 ms
+Size: 2500 
+Parallel: 
+26266.0 ms
+Size: 2500 
+Distributed:
+50133.0 ms
+Size: 3000 
+Sequential: 342902.0 ms
+Size: 3000 
+Parallel: 
+17010.0 ms
+Size: 3000 
+Distributed:
+83091.0 ms
+Size: 3500 
+Sequential: 276039.0 ms
+Size: 3500 
+Parallel: 
+22465.0 ms
+Size: 3500 
+Distributed:
+146672.0 ms
+Size: 4000 
+Sequential: 390793.0 ms
+Size: 4000 
+Parallel: 
+26356.0 ms
+Size: 4000 
+Distributed:
+224311.0 ms

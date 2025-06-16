@@ -187,7 +187,7 @@ public class Distributed {
             //drugite se workers
            // System.out.println("Specify sizes of matrices: ");
             //Scanner sc = new Scanner(System.in);
-            sizeMatArray[0] = 1800;//sc.nextInt();
+            sizeMatArray[0] = 4000;//sc.nextInt();
             //sc.close();
         }
         //Broadcast na golemina na matrica od rank 0 do site drugi procesi
