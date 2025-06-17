@@ -7,7 +7,6 @@ import java.util.Scanner;
 public class Distributed {
 
     private final int [][] A,B;
-    //public static final int threshold = 64; //koga matricite se dovolno mali pa ne ni treba vekje paralelna implementacija
     public Distributed(int size) {
         this.A = new int[size][size];
         this.B = new int[size][size];
@@ -26,14 +25,10 @@ public class Distributed {
         final int ROOT = 0;
 
         if (rank == ROOT) {
-            //int sizeMat = 512; // Replace with Scanner if needed
-            //int[][] A = Sequential.generateMatrix(sizeMat);
-            //int[][] B = Sequential.generateMatrix(sizeMat);
-
             int [][] A = this.A;
             int [][] B = this.B;
 
-            // Divide A and B into submatrices needed for M1–M7
+            // Podeli gi A i B na submatricite M1–M7
             int newSize = sizeMat / 2;
             int[][] A11 = new int[newSize][newSize];
             int[][] A12 = new int[newSize][newSize];
@@ -44,7 +39,7 @@ public class Distributed {
             int[][] B21 = new int[newSize][newSize];
             int[][] B22 = new int[newSize][newSize];
 
-            // Fill the submatrices (you can write a helper method to do this)
+            //gi delime vrednostite od glavnite matrici vo submatricite
             for (int i = 0; i < newSize; i++) {
                 for (int j = 0; j < newSize; j++) {
                     A11[i][j] = A[i][j];
@@ -58,7 +53,8 @@ public class Distributed {
                 }
             }
 
-            // Send data to workers for M1–M7
+            // slednava niza se koristi za da isprakja informacii do workers za M1–M7
+            //koristime MatrixPair da napravime parovi od matrici
             MatrixPair[] sendPairs = new MatrixPair[7];
                     sendPairs[0]=new MatrixPair(sumMatrix(A11, A22), sumMatrix(B11, B22)); // M1
                     sendPairs[1]=new MatrixPair(sumMatrix(A21, A22), B11);                      // M2
@@ -69,19 +65,19 @@ public class Distributed {
                     sendPairs[6]=new MatrixPair(subtractMatrix(A12, A22), sumMatrix(B21, B22));  // M7
 
 
-            for (int i = 1; i <=7; i++) {//promena da ne e <=7 zoshto mozhe da imame povekje od 7 procesi (workers)
-                MPI.COMM_WORLD.Send(sendPairs, i-1, 1, MPI.OBJECT, i, 0);
+            for (int i = 1; i <=7; i++) {//promena da e <=7 zoshto imame 7 procesi (workers)
+                MPI.COMM_WORLD.Send(sendPairs, i-1, 1, MPI.OBJECT, i, 0); //gi isprakjame za sekoj worker po eden par
             }
 
-            // Receive results
+            // niza koja gi prima rezultatite - niza od matrici
             int[][][] results = new int[7][][];
             for (int i = 1; i <= 7; i++) {
                 Object[] recvBuf = new Object[1];
                 MPI.COMM_WORLD.Recv(recvBuf, 0, 1, MPI.OBJECT, i, 1);
-                results[i - 1] = (int[][]) recvBuf[0];
+                results[i - 1] = (int[][]) recvBuf[0]; //gi fetchnuvame matricite
             }
 
-            // Compute final C matrix from M1–M7
+            // Kreiraj ja finalnata matrica od matricite M1-M7
             int[][] M1 = results[0];
             int[][] M2 = results[1];
             int[][] M3 = results[2];
@@ -90,12 +86,13 @@ public class Distributed {
             int[][] M6 = results[5];
             int[][] M7 = results[6];
 
+            //strassen algorithm ovde se primenuva
             int[][] C11 = sumMatrix(subtractMatrix(sumMatrix(M1, M4), M5), M7);
             int[][] C12 = sumMatrix(M3, M5);
             int[][] C21 = sumMatrix(M2, M4);
             int[][] C22 = sumMatrix(subtractMatrix(sumMatrix(M1, M3), M2), M6);
 
-            // Combine into final result matrix
+            //So kombiniranje se dobiva krajnata matrica
             int[][] C = new int[sizeMat][sizeMat];
             for (int i = 0; i < newSize; i++) {
                 for (int j = 0; j < newSize; j++) {
@@ -106,14 +103,16 @@ public class Distributed {
                 }
             }
 
+            //ispishi potvrda
             System.out.println("Distributed multiplication done.");
 
-        } else if (rank >= 1 && rank <=7) {//istata promena na rank da e size a ne 7
+            //ako sme vo workers, togash sekoj worker si ja izvrsuva svojata zadacha, mnozi matrici koi mu se dadeni
+            //pogore spored funkciite ushte koga sme vo ROOT
+        } else if (rank >= 1 && rank <=7) {//istata promena na rank da e 7 bidejki ima 7 worker procesi
             MatrixPair[] recvBuf = new MatrixPair[1];
             MPI.COMM_WORLD.Recv(recvBuf, 0, 1, MPI.OBJECT, ROOT, 0);
             int[][] A = recvBuf[0].A;
             int[][] B = recvBuf[0].B;
-
 
             int[][] C = multiplyMatrix(A, B);
 
@@ -185,10 +184,7 @@ public class Distributed {
 
         if (rank == 0) { //samo root procesot prima input bidejki e main proces
             //drugite se workers
-           // System.out.println("Specify sizes of matrices: ");
-            //Scanner sc = new Scanner(System.in);
-            sizeMatArray[0] = 4000;//sc.nextInt();
-            //sc.close();
+            sizeMatArray[0] = 1000;
         }
         //Broadcast na golemina na matrica od rank 0 do site drugi procesi
         //site procesi ucestvuvaat vo broadcastot
@@ -220,7 +216,7 @@ public class Distributed {
                 }
             } else System.out.println("More than 10mins, stop the testing.");
 
-            MPI.Finalize();
         }
+        MPI.Finalize();
     }
 }

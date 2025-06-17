@@ -13,7 +13,6 @@ public class Main {
         System.out.println("=============================================");
         System.out.println("1. SEQUENTIAL");
         System.out.println("2. PARALLEL");
-        System.out.println("3. DISTRIBUTED");
         System.out.println("=============================================");
         Scanner sc2 = new Scanner(System.in);
         int chosenImp = sc2.nextInt();
@@ -24,9 +23,6 @@ public class Main {
         }
         else if(chosenImp==2){
             parallelRealisation(sizeMat);
-        }
-        else if(chosenImp==3){
-            distributedRealisation(sizeMat);
         }
         else
             return;
@@ -45,7 +41,7 @@ public class Main {
                 else if(chosenImp==2)
                     writer.append("Parallel: \n").append(csvData).append("\n"); //pishuva za parallel
                 else {
-                    writer.append("Distributed: yet to be determined\n"); //pishuva za distributed
+                    writer.append("Invalid number has been typed! Try again.\n"); //pishuva za distributed
                 }
                 //ushte ne e izvedena implementacijata no treba vo eden run za site 3 da se pishuva
             } catch (IOException e) {
@@ -60,12 +56,7 @@ public class Main {
     }
 
     public static void parallelRealisation(int sizeMat){
-        Parallelz par = new Parallelz(sizeMat);
+        Parallel par = new Parallel(sizeMat);
         par.parallelStrassen();
     }
-
-    public static void distributedRealisation(int sizeMat){
-
-    }
-
 }

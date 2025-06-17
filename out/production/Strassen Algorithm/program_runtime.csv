@@ -88,3 +88,24 @@ Parallel:
 Size: 4000 
 Distributed:
 224311.0 ms
+Size: 4000 
+Distributed:
+294626.0 ms
+Size: 4000 
+Distributed:
+270727.0 ms
+Size: 8 
+Parallel: 
+38.0 ms
+Size: 8 
+Parallel: 
+18.0 ms
+Size: 600 
+Distributed:
+1025.0 ms
+Size: 1000 
+Distributed:
+3311.0 ms
+Size: 4 
+Parallel: 
+0.0 ms
